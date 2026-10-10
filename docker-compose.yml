@@ -1,0 +1,34 @@
+services:
+  governance:
+    build: ./governance
+    environment:
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD in .env}
+      AGENT_TOKEN: ${AGENT_TOKEN:?Set AGENT_TOKEN in .env}
+      GATEWAY_TOKEN: ${GATEWAY_TOKEN:?Set GATEWAY_TOKEN in .env}
+      DATA_KEY: ${DATA_KEY:?Set DATA_KEY in .env}
+      DB_PATH: /data/governance.db
+    volumes:
+      - governance_data:/data
+    ports:
+      - "127.0.0.1:8000:8000"
+    networks: [control]
+  protected:
+    build: ./protected
+    environment:
+      GOVERNANCE_URL: http://governance:8000
+      GATEWAY_URL: http://gateway:8000
+      AGENT_TOKEN: ${AGENT_TOKEN:?Set AGENT_TOKEN in .env}
+    networks: [control]
+    depends_on: [governance, gateway]
+  gateway:
+    build: ./gateway
+    environment:
+      GOVERNANCE_URL: http://governance:8000
+      GATEWAY_TOKEN: ${GATEWAY_TOKEN:?Set GATEWAY_TOKEN in .env}
+    networks: [control]
+    depends_on: [governance]
+networks:
+  control:
+    internal: true
+volumes:
+  governance_data: {}

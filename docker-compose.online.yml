@@ -1,0 +1,8 @@
+# Explicit opt-in online mode. Never use this in an air-gapped deployment.
+services:
+  gateway:
+    networks:
+      - control
+      - outbound
+networks:
+  outbound: {}
